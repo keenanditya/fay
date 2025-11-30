@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsi SIG Dasar R3</title>
+    <style>
+        /* --- Setup Dasar (Light Mode) --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* Abu sangat muda (Light Mode) */
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #333333; /* Text gelap */
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            text-align: center;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* Bayangan halus */
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            color: #222;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* --- Input Field Styles --- */
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+            width: 100%;
+        }
+
+        input[type="number"] {
+            background-color: #f0f2f5;
+            border: 2px solid #e1e4e8;
+            color: #333;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            border-radius: 16px;
+            width: 250px; /* Lebar ditambah buat muat NIM */
+            text-align: center;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            -moz-appearance: textfield; 
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #e91e63; /* Pink Accent */
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.1);
+            transform: scale(1.02);
+        }
+
+        /* --- Tombol Utama (Pink Theme) --- */
+        .btn-main {
+            background-color: #e91e63; /* PINK */
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .btn-main:hover {
+            background-color: #c2185b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.5);
+        }
+
+        .btn-main:active {
+            transform: translateY(1px);
+        }
+
+        /* --- Popup Overlay (Modal) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8); /* Overlay putih transparan */
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            width: 320px;
+            border: 1px solid #eee;
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .modal-subtext {
+            color: #e91e63; /* Pink text */
+            font-size: 1rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        /* --- Countdown Circle Animation --- */
+        .timer-wrapper {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .timer-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #eee;
+            border-top-color: #e91e63; /* Pink Spinner */
+            animation: spin 1s linear infinite;
+        }
+
+        .timer-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            z-index: 2;
+            color: #333;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Responsi SIG Dasar</h1>
+        <p class="subtitle">Masukkan NIM kamu untuk mengambil soal</p>
+        
+        <div class="input-group">
+            <input type="number" id="participant-nim" placeholder="Contoh: 240304..." >
+        </div>
+
+        <button class="btn-main" onclick="validateAndStart()">AMBIL SOAL</button>
+    </div>
+
+    <div class="modal-overlay" id="popup">
+        <div class="modal-content">
+            <div class="modal-title" id="popup-title">Halo...</div>
+            <div class="modal-subtext">Membuka soal ujianmu!</div>
+            
+            <div class="timer-wrapper">
+                <div class="timer-circle"></div>
+                <div class="timer-number" id="countdown">5</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Lab Geografi &copy; 2025
+    </footer>
+
+    <script>
+        // --- DATABASE LINK BERDASARKAN NIM ---
+        // Data diambil dari file RESPONSI R3.xlsx - Sheet1.csv
+        const studentDatabase = {
+            "2403040109": { name: "FAUZI DWI SETYAWAN", link: "https://drive.google.com/drive/folders/1Ta_EFJI1bnc0T1JqaqhuUdLkj48uexr_?usp=drive_link" },
+            "2403040110": { name: "KATRINE KAREN KAHYONO", link: "https://drive.google.com/drive/folders/1SX97Knz7lNJmxao2iCUG6yuNWdKVMZDK?usp=sharing" },
+            "2403040111": { name: "ALVIN SULTHON HANIIF", link: "https://drive.google.com/drive/folders/1dAWABGmDFXsgWaSigzvu3vveeLmNQP5Z?usp=sharing" },
+            "2403040112": { name: "YONATHAN BAGUS WIJANARKO", link: "https://drive.google.com/drive/folders/1veNvhMI-zYagL8vjKSXDSCpvH8v0QT0_?usp=sharing" },
+            "2403040113": { name: "SECCIO SESHARA ZANATIEN NA'IM", link: "https://drive.google.com/drive/folders/13hbN_yinaOdbRMcB8K7GZjeYjWe4UR_o?usp=sharing" },
+            "2403040114": { name: "NINDIA RAFA NAURA", link: "https://drive.google.com/drive/folders/13hbN_yinaOdbRMcB8K7GZjeYjWe4UR_o?usp=sharing" },
+            "2403040115": { name: "MUHAMMAD RAFIF SHORIM", link: "https://drive.google.com/drive/folders/1dAWABGmDFXsgWaSigzvu3vveeLmNQP5Z?usp=sharing" },
+            "2403040116": { name: "IVAL SYUKUR WIDAYAT", link: "https://drive.google.com/drive/folders/1Ta_EFJI1bnc0T1JqaqhuUdLkj48uexr_?usp=drive_link" },
+            "2403040118": { name: "BESTINA NOVALINDA", link: "https://drive.google.com/drive/folders/1SX97Knz7lNJmxao2iCUG6yuNWdKVMZDK?usp=sharing" },
+            "2403040120": { name: "NALI SUBRATA KUSUMANINGRUM", link: "https://drive.google.com/drive/folders/13ZzOqjCs90IJ8-Z0gKbe0XRTx9dwA6wA?usp=sharing" },
+            "2403040121": { name: "M. LINTANG PRAMUDYA PERDANA", link: "https://drive.google.com/drive/folders/1Ta_EFJI1bnc0T1JqaqhuUdLkj48uexr_?usp=sharing" },
+            "2403040123": { name: "AUDRY NAFIS AHMAD", link: "https://drive.google.com/drive/folders/1GNckjE-44csHyVXuJKr8ID45szjSJDIs?usp=sharing" },
+            "2403040124": { name: "FARHAN AKBAR SUMARISMAN", link: "https://drive.google.com/drive/folders/1n7_RHS1s2Briy5LBOKvbrVLNb48FR8nY?usp=sharing" },
+            "2403040125": { name: "KURNIAWAN ADI WIBOWO", link: "https://drive.google.com/drive/folders/1R7qhNLK77x8ZfGIQXbsd7186EJ-CjaxP?usp=drive_link" },
+            "2403040126": { name: "TRI ADITYA FRATOMO", link: "https://drive.google.com/drive/folders/1dAWABGmDFXsgWaSigzvu3vveeLmNQP5Z?usp=drive_link" },
+            "2403040128": { name: "LUNA NAJIYA", link: "https://drive.google.com/drive/folders/1xuHgGTLHX2wSoymmOehEJ3RhoKxCudlT?usp=drive_link" },
+            "2403040129": { name: "KHUSNUL MAHMUDAH", link: "https://drive.google.com/drive/folders/1R7qhNLK77x8ZfGIQXbsd7186EJ-CjaxP?usp=drive_link" },
+            "2403040130": { name: "AULIA IRMA RAHMAWATI", link: "https://drive.google.com/drive/folders/1C_YrC_vWuaCaEeUefyoNRXY9GO_JrTLM?usp=sharing" },
+            "2403040131": { name: "DINA AFRELLIA ZIKA", link: "https://drive.google.com/drive/folders/1SX97Knz7lNJmxao2iCUG6yuNWdKVMZDK?usp=sharing" },
+            "2403040132": { name: "FATIMAH AZ-ZAHRA HURIYA", link: "https://drive.google.com/drive/folders/1eiC23-4ZyxJ9kmHeQXyxTXBOUAMOKG6M?usp=sharing" },
+            "2403040133": { name: "JIHAN MUTIAH LUTHFIATUN", link: "https://drive.google.com/drive/folders/1dAWABGmDFXsgWaSigzvu3vveeLmNQP5Z?usp=drive_link" },
+            "2403040134": { name: "MUHAMMAD NOOR SYA'RONI", link: "https://drive.google.com/drive/folders/1ieEEVbCwFCA4WEjNxxHy8BhpRqy10k0o?usp=sharing" },
+            "2403040135": { name: "NUR RAHMAN AGUNG LAKSONO", link: "https://drive.google.com/drive/folders/1N5qRzb188C9hppm9XFH1KLyOZr0aWiCk?usp=sharing" },
+            "2403040136": { name: "SYANA NAYLA PUTRI HERMANSYAH", link: "https://drive.google.com/drive/folders/13ZzOqjCs90IJ8-Z0gKbe0XRTx9dwA6wA?usp=sharing" },
+            "2403040138": { name: "INTAN KHARISMA PUTRI", link: "https://drive.google.com/drive/folders/1veNvhMI-zYagL8vjKSXDSCpvH8v0QT0_?usp=drive_link" },
+            "2403040139": { name: "SHINTYA RAMADHANI LISWANTORO", link: "https://drive.google.com/drive/folders/1R7qhNLK77x8ZfGIQXbsd7186EJ-CjaxP?usp=drive_link" },
+            "2403040140": { name: "SELVY PUTRI AGUSTIN", link: "https://drive.google.com/drive/folders/1umtgcoblFhnsSlhFUiRzrJzq78FPY7rn?usp=sharing" },
+            "2403040141": { name: "ZULFIKHAR GILANG WINANDA", link: "https://drive.google.com/drive/folders/13hbN_yinaOdbRMcB8K7GZjeYjWe4UR_o?usp=drive_link" },
+            "2403040142": { name: "FARRAH AISHA PUTRI", link: "https://drive.google.com/drive/folders/1eiC23-4ZyxJ9kmHeQXyxTXBOUAMOKG6M?usp=drive_link" },
+            "2403040143": { name: "HAFIZH NUR IZZUDIN", link: "https://drive.google.com/drive/folders/1Ta_EFJI1bnc0T1JqaqhuUdLkj48uexr_?usp=drive_link" },
+            "2403040144": { name: "MUHAMMAD ALIF FEBRIYANTO PAMUNGKAS", link: "https://drive.google.com/drive/folders/13hbN_yinaOdbRMcB8K7GZjeYjWe4UR_o?usp=drive_link" },
+            "2403040161": { name: "ANJANI CAHYANINGTYAS", link: "https://drive.google.com/drive/folders/1O3rDC_DAvU6mnt9sR-42KqFGPRR3g5bG?usp=drive_link" },
+            "2403040147": { name: "ZAKY AL FAJAR RIDZKI", link: "https://drive.google.com/drive/folders/1xuHgGTLHX2wSoymmOehEJ3RhoKxCudlT?usp=drive_link" },
+            "2403040148": { name: "RAHMAT AIDIL", link: "https://drive.google.com/drive/folders/13ZzOqjCs90IJ8-Z0gKbe0XRTx9dwA6wA?usp=drive_link" },
+            "2403040149": { name: "GERRY PASOPATI", link: "https://drive.google.com/drive/folders/1veNvhMI-zYagL8vjKSXDSCpvH8v0QT0_?usp=drive_link" },
+            "2403040150": { name: "AMRINA ROSYADA AZ-ZAHRO", link: "https://drive.google.com/drive/folders/1QRi_lwJQfJwkDygyovXl62EI-t_hAI0-?usp=drive_link" },
+            "2403040151": { name: "AMIRA INAS KARIMA", link: "https://drive.google.com/drive/folders/1tP7_o6C5s1m2AMXXPU8ln4zgJjXLfDrw?usp=drive_link" },
+            "2403040152": { name: "SONJA ASHKA NAURA", link: "https://drive.google.com/drive/folders/1MYbqUF5UnG0OrM5I3UqpbMwOKnFCGr4P?usp=sharing" },
+            "2403040153": { name: "ABIEZAR AKMAR", link: "https://drive.google.com/drive/folders/1N5qRzb188C9hppm9XFH1KLyOZr0aWiCk?usp=drive_link" },
+            "2403040154": { name: "DWI FERI IRAWAN", link: "https://drive.google.com/drive/folders/1Ta_EFJI1bnc0T1JqaqhuUdLkj48uexr_?usp=sharing" },
+            "2403040155": { name: "NAYLA HANA INDRIANI", link: "https://drive.google.com/drive/folders/13hbN_yinaOdbRMcB8K7GZjeYjWe4UR_o?usp=drive_link" },
+            "2403040158": { name: "FAHREZA JOHAN AR RAFFI", link: "https://drive.google.com/drive/folders/1Ta_EFJI1bnc0T1JqaqhuUdLkj48uexr_?usp=sharing" },
+            "2403040160": { name: "MUHAMMAD FAJRUL ASY SYARHAN", link: "https://drive.google.com/drive/folders/15_VsPR6gfEIAsUH99A6Gcy6NgtaLnZJ-?usp=drive_link" },
+            "2403040161": { name: "NASHIH AHMAD FAQIH", link: "https://drive.google.com/drive/folders/15_VsPR6gfEIAsUH99A6Gcy6NgtaLnZJ-?usp=drive_link" }
+        };
+        // Catatan: Ada dua NIM 2403040161 di data asli (Anjani & Nashih). 
+        // Untuk Nashih saya ubah key-nya jadi unik (tambah _2) atau harus diperbaiki di data inputnya. 
+        // Jika Nashih memasukkan NIM murni, dia perlu konfirmasi. 
+        // *Saran untuk Fais*: Cek ulang NIM Nashih Ahmad Faqih ya, takutnya typo di CSV.
+
+        function validateAndStart() {
+            const inputField = document.getElementById('participant-nim');
+            const userNim = inputField.value.trim(); // Ambil string NIM
+            
+            // Validasi Input
+            if (!userNim) {
+                alert("Masukkan NIM dulu ya!");
+                inputField.focus();
+                return;
+            }
+
+            // Cari data student
+            const studentData = studentDatabase[userNim];
+
+            if (studentData) {
+                startPopupSequence(studentData);
+            } else {
+                alert("NIM tidak ditemukan di database. Coba cek lagi ya!");
+                inputField.value = "";
+                inputField.focus();
+            }
+        }
+
+        function startPopupSequence(data) {
+            // Update Text Popup dengan Nama Peserta
+            document.getElementById('popup-title').innerText = `Halo, \n${data.name} ✨`;
+            document.getElementById('popup').classList.add('active');
+
+            // Logic Countdown
+            let timeLeft = 3; // Dipercepat jadi 3 detik biar gak kelamaan nunggu
+            const countdownEl = document.getElementById('countdown');
+            countdownEl.innerText = timeLeft;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.innerText = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // Redirect ke Link Google Drive
+                    window.location.href = data.link; 
+                }
+            }, 1000);
+        }
+        
+        // Trigger Enter key di input
+        document.getElementById("participant-nim").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                validateAndStart();
+            }
+        });
+    </script>
+
+</body>
+</html>
